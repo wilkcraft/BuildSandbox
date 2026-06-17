@@ -6,11 +6,15 @@
       "biome": "minecraft:plains",
       "features": false,
       "lakes": false,
+      "structures": {
+        "structures": {}
+      },
       "layers": [
         {
           "block": "minecraft:bedrock",
           "height": 1
         },
+
         {
           "block": "minecraft:dirt",
           "height": 8

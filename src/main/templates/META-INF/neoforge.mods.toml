@@ -4,7 +4,7 @@ loaderVersion="${loader_version_range}"
 
 license="${mod_license}"
 
-#issueTrackerURL="https://change.me.to.your.issue.tracker.example.invalid/" #optional
+issueTrackerURL="https://github.com/wilkcraft/BuildSandbox/issues"
 
 [[mods]]
 
@@ -16,7 +16,7 @@ displayName="${mod_name}"
 
 #updateJSONURL="https://change.me.example.invalid/updates.json" #optional
 
-#displayURL="https://change.me.to.your.mods.homepage.example.invalid/" #optional
+displayURL="https://github.com/wilkcraft/BuildSandbox"
 
 #logoFile="examplemod.png" #optional
 
