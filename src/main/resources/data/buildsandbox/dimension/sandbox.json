@@ -3,7 +3,7 @@
   "generator": {
     "type": "minecraft:flat",
     "settings": {
-      "biome": "minecraft:plains",
+      "biome": "buildsandbox:build_grid",
       "features": false,
       "lakes": false,
       "structures": {
@@ -14,13 +14,12 @@
           "block": "minecraft:bedrock",
           "height": 1
         },
-
         {
-          "block": "minecraft:dirt",
+          "block": "minecraft:stone",
           "height": 8
         },
         {
-          "block": "minecraft:grass_block",
+          "block": "minecraft:light_gray_concrete",
           "height": 1
         }
       ]

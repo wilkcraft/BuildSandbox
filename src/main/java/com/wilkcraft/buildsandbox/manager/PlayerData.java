@@ -1,21 +1,17 @@
 package com.wilkcraft.buildsandbox.manager;
 
+import java.util.List;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
-import java.util.List;
-
 public class PlayerData {
-
-  // Supervivencia
 
   private ResourceKey<Level> survivalDimension;
   private BlockPos survivalPosition;
   private List<ItemStack> survivalInventory;
-
-  // Sandbox
 
   private BlockPos sandboxPosition;
   private List<ItemStack> sandboxInventory;

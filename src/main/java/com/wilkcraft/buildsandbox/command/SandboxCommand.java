@@ -9,6 +9,7 @@ import com.wilkcraft.buildsandbox.world.BuildSandboxDimension;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
@@ -21,90 +22,124 @@ public class SandboxCommand {
 
                 dispatcher.register(
                                 Commands.literal("buildsandbox")
-                                                .executes(context -> {
+                                                .executes(context -> execute(context.getSource())));
 
-                                                        ServerPlayer player = context.getSource()
-                                                                        .getPlayerOrException();
-                                                        var uuid = player.getUUID();
+                dispatcher.register(
+                                Commands.literal("bs")
+                                                .executes(context -> execute(context.getSource())));
+        }
 
-                                                        PlayerData data = SandboxManager.getData(uuid);
+        private static int execute(CommandSourceStack source) {
 
-                                                        boolean entering = !SandboxManager.isInSandbox(uuid);
+                try {
 
-                                                        if (entering) {
+                        ServerPlayer player = source.getPlayerOrException();
 
-                                                                data.setSurvivalDimension(player.level().dimension());
-                                                                data.setSurvivalPosition(player.blockPosition());
-                                                                data.setSurvivalInventory(
-                                                                                InventoryManager.copyInventory(player));
+                        toggleSandbox(player);
 
-                                                                InventoryManager.loadInventory(player,
-                                                                                data.getSandboxInventory());
-                                                                player.setGameMode(GameType.CREATIVE);
+                        return 1;
 
-                                                                ServerLevel sandboxLevel = player.server.getLevel(
-                                                                                ResourceKey.create(
-                                                                                                net.minecraft.core.registries.Registries.DIMENSION,
-                                                                                                BuildSandboxDimension.SANDBOX_ID));
+                } catch (Exception e) {
 
-                                                                if (sandboxLevel != null) {
+                        return 0;
+                }
+        }
 
-                                                                        SandboxManager.setInSandbox(uuid, true);
-                                                                        SandboxManager.allowTravel(uuid);
+        public static void toggleSandbox(ServerPlayer player) {
 
-                                                                        BlockPos pos = data.getSandboxPosition();
+                var uuid = player.getUUID();
 
-                                                                        if (pos == null) {
-                                                                                player.teleportTo(sandboxLevel, 0.5, 64,
-                                                                                                0.5, 0, 0);
-                                                                        } else {
-                                                                                player.teleportTo(
-                                                                                                sandboxLevel,
-                                                                                                pos.getX() + 0.5,
-                                                                                                pos.getY(),
-                                                                                                pos.getZ() + 0.5,
-                                                                                                player.getYRot(),
-                                                                                                player.getXRot());
-                                                                        }
-                                                                }
+                PlayerData data = SandboxManager.getData(uuid);
 
-                                                                player.sendSystemMessage(Component.literal(
-                                                                                "You entered the Build Sandbox"));
+                boolean entering = !SandboxManager.isInSandbox(uuid);
 
-                                                        } else {
+                if (entering) {
 
-                                                                data.setSandboxPosition(player.blockPosition());
-                                                                data.setSandboxInventory(
-                                                                                InventoryManager.copyInventory(player));
+                        data.setSurvivalDimension(player.level().dimension());
+                        data.setSurvivalPosition(player.blockPosition());
+                        data.setSurvivalInventory(
+                                        InventoryManager.copyInventory(player));
 
-                                                                InventoryManager.loadInventory(player,
-                                                                                data.getSurvivalInventory());
-                                                                player.setGameMode(GameType.SURVIVAL);
+                        InventoryManager.loadInventory(
+                                        player,
+                                        data.getSandboxInventory());
 
-                                                                ServerLevel oldLevel = player.server
-                                                                                .getLevel(data.getSurvivalDimension());
+                        player.setGameMode(GameType.CREATIVE);
 
-                                                                if (oldLevel != null) {
+                        ServerLevel sandboxLevel = player.server.getLevel(
+                                        ResourceKey.create(
+                                                        Registries.DIMENSION,
+                                                        BuildSandboxDimension.SANDBOX_ID));
 
-                                                                        SandboxManager.setInSandbox(uuid, false);
-                                                                        SandboxManager.allowTravel(uuid);
+                        if (sandboxLevel != null) {
 
-                                                                        BlockPos pos = data.getSurvivalPosition();
+                                SandboxManager.setInSandbox(uuid, true);
+                                SandboxManager.allowTravel(uuid);
 
-                                                                        player.teleportTo(
-                                                                                        oldLevel,
-                                                                                        pos.getX() + 0.5,
-                                                                                        pos.getY(),
-                                                                                        pos.getZ() + 0.5,
-                                                                                        player.getYRot(),
-                                                                                        player.getXRot());
-                                                                }
+                                BlockPos pos = data.getSandboxPosition();
 
-                                                                player.sendSystemMessage(Component
-                                                                                .literal("You left the Build Sandbox"));
-                                                        }
+                                if (pos == null) {
 
-                                                        return 1;
-                                                }));
+                                        player.teleportTo(
+                                                        sandboxLevel,
+                                                        0.5,
+                                                        -52,
+                                                        0.5,
+                                                        0,
+                                                        0);
+
+                                } else {
+
+                                        player.teleportTo(
+                                                        sandboxLevel,
+                                                        pos.getX() + 0.5,
+                                                        pos.getY(),
+                                                        pos.getZ() + 0.5,
+                                                        player.getYRot(),
+                                                        player.getXRot());
+                                }
+                        }
+
+                        player.sendSystemMessage(
+                                        Component.literal(
+                                                        "You entered the Build Sandbox"));
+
+                } else {
+
+                        data.setSandboxPosition(
+                                        player.blockPosition());
+
+                        data.setSandboxInventory(
+                                        InventoryManager.copyInventory(player));
+
+                        InventoryManager.loadInventory(
+                                        player,
+                                        data.getSurvivalInventory());
+
+                        player.setGameMode(GameType.SURVIVAL);
+
+                        ServerLevel oldLevel = player.server.getLevel(
+                                        data.getSurvivalDimension());
+
+                        if (oldLevel != null) {
+
+                                SandboxManager.setInSandbox(uuid, false);
+                                SandboxManager.allowTravel(uuid);
+
+                                BlockPos pos = data.getSurvivalPosition();
+
+                                player.teleportTo(
+                                                oldLevel,
+                                                pos.getX() + 0.5,
+                                                pos.getY(),
+                                                pos.getZ() + 0.5,
+                                                player.getYRot(),
+                                                player.getXRot());
+                        }
+
+                        player.sendSystemMessage(
+                                        Component.literal(
+                                                        "You left the Build Sandbox"));
+                }
         }
 }
