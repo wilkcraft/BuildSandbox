@@ -2,6 +2,8 @@ package com.wilkcraft.buildsandbox;
 
 import com.mojang.logging.LogUtils;
 import com.wilkcraft.buildsandbox.command.SandboxCommand;
+import com.wilkcraft.buildsandbox.command.SandboxItemCommand;
+
 import org.slf4j.Logger;
 
 import net.neoforged.bus.api.IEventBus;
@@ -27,7 +29,10 @@ public class BuildSandbox {
     @SubscribeEvent
     public void onRegisterCommands(RegisterCommandsEvent event) {
 
-        SandboxCommand.register(event.getDispatcher());
+        SandboxCommand.register(
+                event.getDispatcher());
 
+        SandboxItemCommand.register(
+                event.getDispatcher());
     }
 }

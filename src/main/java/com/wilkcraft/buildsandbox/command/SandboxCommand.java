@@ -6,6 +6,7 @@ import com.wilkcraft.buildsandbox.manager.PlayerData;
 import com.wilkcraft.buildsandbox.manager.SandboxManager;
 import com.wilkcraft.buildsandbox.world.BuildSandboxDimension;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
@@ -17,6 +18,14 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.GameType;
 
 public class SandboxCommand {
+        private static void hotbar(
+                        ServerPlayer player,
+                        Component message) {
+
+                player.displayClientMessage(
+                                message,
+                                true);
+        }
 
         public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
 
@@ -100,9 +109,13 @@ public class SandboxCommand {
                                 }
                         }
 
-                        player.sendSystemMessage(
-                                        Component.literal(
-                                                        "You entered the Build Sandbox"));
+                        hotbar(
+                                        player,
+                                        Component.literal("Entered ")
+                                                        .withStyle(ChatFormatting.GREEN)
+                                                        .append(
+                                                                        Component.literal("Build Sandbox")
+                                                                                        .withStyle(ChatFormatting.AQUA)));
 
                 } else {
 
@@ -137,9 +150,13 @@ public class SandboxCommand {
                                                 player.getXRot());
                         }
 
-                        player.sendSystemMessage(
-                                        Component.literal(
-                                                        "You left the Build Sandbox"));
+                        hotbar(
+                                        player,
+                                        Component.literal("Returned to ")
+                                                        .withStyle(ChatFormatting.YELLOW)
+                                                        .append(
+                                                                        Component.literal("Survival")
+                                                                                        .withStyle(ChatFormatting.GOLD)));
                 }
         }
 }

@@ -16,6 +16,8 @@ public class PlayerData {
   private BlockPos sandboxPosition;
   private List<ItemStack> sandboxInventory;
 
+  private ItemStack activationItem = ItemStack.EMPTY;
+
   public ResourceKey<Level> getSurvivalDimension() {
     return survivalDimension;
   }
@@ -54,5 +56,13 @@ public class PlayerData {
 
   public void setSandboxInventory(List<ItemStack> sandboxInventory) {
     this.sandboxInventory = sandboxInventory;
+  }
+
+  public ItemStack getActivationItem() {
+    return activationItem;
+  }
+
+  public void setActivationItem(ItemStack activationItem) {
+    this.activationItem = activationItem;
   }
 }
