@@ -12,7 +12,7 @@ public class InventoryManager {
 
     player.getInventory().clearContent();
 
-    for (int i = 0; i < saved.size(); i++) {
+    for (int i = 0; i < Math.min(saved.size(), player.getInventory().getContainerSize()); i++) {
       player.getInventory().setItem(i, saved.get(i));
     }
 
@@ -47,7 +47,7 @@ public class InventoryManager {
 
     if (inventory != null) {
 
-      for (int i = 0; i < inventory.size(); i++) {
+      for (int i = 0; i < Math.min(inventory.size(), player.getInventory().getContainerSize()); i++) {
 
         player.getInventory()
             .setItem(i, inventory.get(i));

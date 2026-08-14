@@ -58,11 +58,28 @@ public class SandboxCommand {
 
                 var uuid = player.getUUID();
 
-                PlayerData data = SandboxManager.getData(uuid);
+                PlayerData data = SandboxManager.getData(player);
 
-                boolean entering = !SandboxManager.isInSandbox(uuid);
+                boolean physicallyInSandbox = player.level()
+                                .dimension()
+                                .location()
+                                .equals(BuildSandboxDimension.SANDBOX_ID);
+                boolean entering = !SandboxManager.isInSandbox(uuid) && !physicallyInSandbox;
 
                 if (entering) {
+
+                        ServerLevel sandboxLevel = player.server.getLevel(
+                                        ResourceKey.create(
+                                                        Registries.DIMENSION,
+                                                        BuildSandboxDimension.SANDBOX_ID));
+
+                        if (sandboxLevel == null) {
+                                hotbar(
+                                                player,
+                                                Component.literal("Sandbox dimension is unavailable")
+                                                                .withStyle(ChatFormatting.RED));
+                                return;
+                        }
 
                         data.setSurvivalDimension(player.level().dimension());
                         data.setSurvivalPosition(player.blockPosition());
@@ -75,39 +92,32 @@ public class SandboxCommand {
 
                         player.setGameMode(GameType.CREATIVE);
 
-                        ServerLevel sandboxLevel = player.server.getLevel(
-                                        ResourceKey.create(
-                                                        Registries.DIMENSION,
-                                                        BuildSandboxDimension.SANDBOX_ID));
+                        SandboxManager.allowTravel(uuid);
 
-                        if (sandboxLevel != null) {
+                        BlockPos pos = data.getSandboxPosition();
 
-                                SandboxManager.setInSandbox(uuid, true);
-                                SandboxManager.allowTravel(uuid);
+                        if (pos == null) {
 
-                                BlockPos pos = data.getSandboxPosition();
+                                player.teleportTo(
+                                                sandboxLevel,
+                                                0.5,
+                                                -52,
+                                                0.5,
+                                                0,
+                                                0);
 
-                                if (pos == null) {
+                        } else {
 
-                                        player.teleportTo(
-                                                        sandboxLevel,
-                                                        0.5,
-                                                        -52,
-                                                        0.5,
-                                                        0,
-                                                        0);
-
-                                } else {
-
-                                        player.teleportTo(
-                                                        sandboxLevel,
-                                                        pos.getX() + 0.5,
-                                                        pos.getY(),
-                                                        pos.getZ() + 0.5,
-                                                        player.getYRot(),
-                                                        player.getXRot());
-                                }
+                                player.teleportTo(
+                                                sandboxLevel,
+                                                pos.getX() + 0.5,
+                                                pos.getY(),
+                                                pos.getZ() + 0.5,
+                                                player.getYRot(),
+                                                player.getXRot());
                         }
+
+                        SandboxManager.setInSandbox(player, true);
 
                         hotbar(
                                         player,
@@ -118,6 +128,24 @@ public class SandboxCommand {
                                                                                         .withStyle(ChatFormatting.AQUA)));
 
                 } else {
+
+                        if (data.getSurvivalDimension() == null
+                                        || data.getSurvivalPosition() == null
+                                        || data.getSurvivalInventory() == null) {
+                                recoverOrphanedPlayer(player);
+                                return;
+                        }
+
+                        ServerLevel oldLevel = player.server.getLevel(
+                                        data.getSurvivalDimension());
+
+                        if (oldLevel == null) {
+                                hotbar(
+                                                player,
+                                                Component.literal("Saved survival dimension is unavailable")
+                                                                .withStyle(ChatFormatting.RED));
+                                return;
+                        }
 
                         data.setSandboxPosition(
                                         player.blockPosition());
@@ -131,24 +159,19 @@ public class SandboxCommand {
 
                         player.setGameMode(GameType.SURVIVAL);
 
-                        ServerLevel oldLevel = player.server.getLevel(
-                                        data.getSurvivalDimension());
+                        SandboxManager.allowTravel(uuid);
 
-                        if (oldLevel != null) {
+                        BlockPos pos = data.getSurvivalPosition();
 
-                                SandboxManager.setInSandbox(uuid, false);
-                                SandboxManager.allowTravel(uuid);
+                        player.teleportTo(
+                                        oldLevel,
+                                        pos.getX() + 0.5,
+                                        pos.getY(),
+                                        pos.getZ() + 0.5,
+                                        player.getYRot(),
+                                        player.getXRot());
 
-                                BlockPos pos = data.getSurvivalPosition();
-
-                                player.teleportTo(
-                                                oldLevel,
-                                                pos.getX() + 0.5,
-                                                pos.getY(),
-                                                pos.getZ() + 0.5,
-                                                player.getYRot(),
-                                                player.getXRot());
-                        }
+                        SandboxManager.setInSandbox(player, false);
 
                         hotbar(
                                         player,
@@ -158,5 +181,30 @@ public class SandboxCommand {
                                                                         Component.literal("Survival")
                                                                                         .withStyle(ChatFormatting.GOLD)));
                 }
+        }
+
+        private static void recoverOrphanedPlayer(ServerPlayer player) {
+                ServerLevel overworld = player.server.overworld();
+                BlockPos pos = overworld.getSharedSpawnPos();
+
+                // Older versions never wrote the survival snapshot to disk. The original
+                // inventory cannot be reconstructed, so do not leak the creative inventory
+                // out of the sandbox while allowing the player to leave safely.
+                InventoryManager.clearInventory(player);
+                player.setGameMode(GameType.SURVIVAL);
+                SandboxManager.allowTravel(player.getUUID());
+                player.teleportTo(
+                                overworld,
+                                pos.getX() + 0.5,
+                                pos.getY(),
+                                pos.getZ() + 0.5,
+                                player.getYRot(),
+                                player.getXRot());
+                SandboxManager.setInSandbox(player, false);
+
+                hotbar(
+                                player,
+                                Component.literal("Recovered from sandbox; no saved survival inventory existed")
+                                                .withStyle(ChatFormatting.YELLOW));
         }
 }
