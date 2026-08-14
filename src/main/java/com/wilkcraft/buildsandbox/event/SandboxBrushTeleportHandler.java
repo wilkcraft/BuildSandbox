@@ -39,7 +39,7 @@ public class SandboxBrushTeleportHandler {
 
   private static boolean isActivationItem(ServerPlayer player) {
 
-    PlayerData data = SandboxManager.getData(player.getUUID());
+    PlayerData data = SandboxManager.getData(player);
 
     ItemStack configured = data.getActivationItem();
 

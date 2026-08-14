@@ -69,11 +69,11 @@ public class SandboxItemCommand {
         return 0;
       }
 
-      PlayerData data = SandboxManager.getData(
-          player.getUUID());
+      PlayerData data = SandboxManager.getData(player);
 
       data.setActivationItem(
           stack.copyWithCount(1));
+      SandboxManager.save(player);
 
       hotbar(
           player,
@@ -126,11 +126,11 @@ public class SandboxItemCommand {
 
       ServerPlayer player = source.getPlayerOrException();
 
-      PlayerData data = SandboxManager.getData(
-          player.getUUID());
+      PlayerData data = SandboxManager.getData(player);
 
       data.setActivationItem(
           ItemStack.EMPTY);
+      SandboxManager.save(player);
 
       hotbar(
           player,
