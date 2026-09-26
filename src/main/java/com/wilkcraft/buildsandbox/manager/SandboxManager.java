@@ -12,6 +12,12 @@ public class SandboxManager {
   private static final Set<UUID> IN_SANDBOX = new HashSet<>();
   private static final Set<UUID> ALLOWED_TRAVEL = new HashSet<>();
 
+  private static final String CURIOS_MODID = "curios";
+
+  public static boolean isCuriosLoaded() {
+    return net.neoforged.fml.ModList.get().isLoaded(CURIOS_MODID);
+  }
+
   public static PlayerData getData(UUID uuid) {
     return PLAYER_DATA.computeIfAbsent(uuid, id -> new PlayerData());
   }

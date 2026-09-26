@@ -3,6 +3,7 @@ package com.wilkcraft.buildsandbox.manager;
 import java.util.List;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -17,6 +18,9 @@ public class PlayerData {
   private List<ItemStack> sandboxInventory;
 
   private ItemStack activationItem = ItemStack.EMPTY;
+
+  private ListTag survivalCurios;
+  private ListTag sandboxCurios;
 
   public ResourceKey<Level> getSurvivalDimension() {
     return survivalDimension;
@@ -42,6 +46,14 @@ public class PlayerData {
     this.survivalInventory = survivalInventory;
   }
 
+  public ListTag getSurvivalCurios() {
+    return survivalCurios;
+  }
+
+  public void setSurvivalCurios(ListTag survivalCurios) {
+    this.survivalCurios = survivalCurios;
+  }
+
   public BlockPos getSandboxPosition() {
     return sandboxPosition;
   }
@@ -56,6 +68,14 @@ public class PlayerData {
 
   public void setSandboxInventory(List<ItemStack> sandboxInventory) {
     this.sandboxInventory = sandboxInventory;
+  }
+
+  public ListTag getSandboxCurios() {
+    return sandboxCurios;
+  }
+
+  public void setSandboxCurios(ListTag sandboxCurios) {
+    this.sandboxCurios = sandboxCurios;
   }
 
   public ItemStack getActivationItem() {
